@@ -4,7 +4,7 @@ Versión web de `jebrix`, desarrollada con React, TypeScript y Vite. Utiliza **e
 
 ## Iniciar
 
-Requisitos: Node.js 22.12+ o 24 y acceso al backend utilizado por la app móvil.
+Requisitos: Node.js 24 y acceso al backend utilizado por la app móvil.
 
 ```powershell
 cd C:\github\jebryx_web
@@ -96,7 +96,9 @@ Publica el contenido de `dist/` en tu hosting. Configura el servidor para devolv
 
 En Vercel, `vercel.json` aplica primero el proxy de API y después la reescritura de las pantallas a `index.html`. Así `/api/v1/auth/google` llega a Railway, mientras que abrir o recargar `/login`, `/register` y las demás rutas carga la aplicación. Las respuestas de API no se almacenan en la caché de Vercel.
 
-Usa el preset **Vite**, el comando `npm run build` y el directorio de salida `dist`. Mantén `VITE_API_URL` vacía o elimina esa variable del proyecto de Vercel para usar el proxy configurado. `VITE_API_PROXY_TARGET` solo afecta el desarrollo local.
+El repositorio fija Node.js 24 en `package.json`. `vercel.json` configura el preset **Vite**, la instalación reproducible `npm ci --include=dev --include=optional`, el comando `npm run build` y el directorio de salida `dist`. Las dependencias de desarrollo incluyen TypeScript y Vite; las opcionales incluyen el binario de esbuild para la plataforma del build. Mantén `VITE_API_URL` vacía o elimina esa variable del proyecto de Vercel para usar el proxy configurado. `VITE_API_PROXY_TARGET` solo afecta el desarrollo local.
+
+`package.json` autoriza el script de instalación de `esbuild@0.28.2` mediante `allowScripts`. Si una actualización cambia esa versión, revisa el paquete y ejecuta `npm approve-scripts esbuild` (o `npm install-scripts approve esbuild` en npm más reciente) para actualizar la autorización. El mensaje de financiación (`npm fund`) es informativo. La advertencia `Unknown env config "cache-dir"` indica una opción de npm recibida mediante el entorno; este repositorio no la define. Si configuraste `NPM_CONFIG_CACHE_DIR` en Vercel, elimínala o usa `NPM_CONFIG_CACHE`. Estas advertencias por sí solas no indican que el deploy haya fallado: si falla, revisa las líneas posteriores a `tsc -b && vite build` y el código de salida.
 
 Incluye `vercel.json` en el commit que despliegas y realiza un nuevo despliegue de ese commit. Volver a desplegar un commit anterior no aplica la corrección. Comprueba `https://jebryx-web.vercel.app/api/v1/health`: debe devolver JSON con `service: "jebryx-api"`, no HTML. Comprueba también el acceso directo y la recarga de `/login`.
 
