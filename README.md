@@ -90,6 +90,8 @@ npm run build
 
 Publica el contenido de `dist/` en tu hosting. Configura el servidor para devolver `index.html` en las rutas de la aplicación. El proxy de Vite existe **solo en desarrollo**.
 
+En Vercel, `vercel.json` configura esa reescritura para que abrir o recargar `/login`, `/register` y las demás rutas cargue la aplicación y React Router resuelva la pantalla. Usa el preset **Vite**, el comando `npm run build` y el directorio de salida `dist`. El archivo debe incluirse en el commit que despliegas; volver a desplegar un commit anterior no aplica la corrección. Después del despliegue, comprueba el acceso directo y la recarga de `/login`.
+
 Opciones para conectar la misma API en producción:
 
 1. Mantener `VITE_API_URL=` y configurar un reverse proxy `/api/` en el dominio web hacia JEBRYX_API. El proxy debe preservar `Authorization`, `X-Profile-Id` y `X-Timezone`, y desactivar el buffering en el streaming del coach.
