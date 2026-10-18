@@ -1,6 +1,5 @@
 import { useState, type FormEvent } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
-import { GoogleLogin } from "@react-oauth/google";
 import {
   ArrowLeft,
   ArrowUpRight,
@@ -16,7 +15,8 @@ import { GOOGLE_WEB_CLIENT_ID } from "@/lib/config";
 import { usePrefs, useSession } from "@/lib/store";
 import { Button, ErrorBox, Field, IconButton, useToast } from "@/components/ui";
 import { useText } from "@/lib/hooks";
-import { Brand, Logo } from "@/components/Brand";
+import { Logo } from "@/components/Brand";
+import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 
 export type AuthMode =
   | "login"
@@ -128,7 +128,9 @@ export default function Auth({ mode }: { mode: AuthMode }) {
   return (
     <div className="auth-shell">
       <aside className="auth-story">
-        <Brand to="/login" />
+        <Link className="auth-form-logo" to="/login">
+          <Logo size={260} />
+        </Link>
         <div className="auth-story-copy">
           <span className="eyebrow">
             <span className="status-dot" />
@@ -146,39 +148,25 @@ export default function Auth({ mode }: { mode: AuthMode }) {
               "Understand your money, build better habits, and take your next step with confidence.",
             )}
           </p>
-          <div className="auth-illustration">
-            <div className="orbit orbit-one" />
-            <div className="orbit orbit-two" />
-            <div className="illustration-symbol">
-              <Logo size={160} />
-            </div>
-            <div className="floating-label">
-              <ShieldCheck size={20} />
-              {tr("Tu dinero, con claridad", "Your money, made clear")}
-              <ArrowUpRight size={17} />
-            </div>
-          </div>
         </div>
         <small>
           © {new Date().getFullYear()} Jebryx ·{" "}
           {tr("Un hábito a la vez.", "One habit at a time.")}
         </small>
       </aside>
+      <div className="auth-tools">
+        <button
+          type="button"
+          aria-label={tr("Cambiar a inglés", "Switch to Spanish")}
+          onClick={() =>
+            update({ language: prefs.language === "es" ? "en" : "es" })
+          }
+        >
+          {prefs.language === "es" ? "EN" : "ES"}
+        </button>
+      </div>
       <main className="auth-main">
-        <div className="auth-tools">
-          <button
-            onClick={() =>
-              update({ language: prefs.language === "es" ? "en" : "es" })
-            }
-          >
-            {prefs.language === "es" ? "EN" : "ES"}
-          </button>
-        </div>
         <div className="auth-form-wrap">
-          <Brand className="mobile-brand" to="/login" />
-          <div className="auth-form-logo">
-            <Logo size={88} />
-          </div>
           {mode !== "login" && mode !== "register" && (
             <Link className="text-link back-link" to="/login">
               <ArrowLeft size={15} />
@@ -346,37 +334,35 @@ export default function Auth({ mode }: { mode: AuthMode }) {
                   <div className="divider">
                     <span>{tr("o continúa con", "or continue with")}</span>
                   </div>
-                  <div className="google-button">
-                    <GoogleLogin
-                      locale={prefs.language}
-                      onSuccess={async (result) => {
-                        if (!result.credential || busy) return;
-                        setBusy(true);
-                        setError(null);
-                        try {
-                          acceptSession(
-                            await api.loginWithGoogle({
-                              idToken: result.credential,
-                            }),
-                          );
-                        } catch (err) {
-                          setError(err);
-                        } finally {
-                          setBusy(false);
-                        }
-                      }}
-                      onError={() =>
-                        setError(
-                          new Error(
-                            tr(
-                              "No se pudo iniciar sesión con Google.",
-                              "Google sign in failed.",
-                            ),
-                          ),
-                        )
+                  <GoogleSignInButton
+                    busy={busy}
+                    onSuccess={async (result) => {
+                      if (!result.credential || busy) return;
+                      setBusy(true);
+                      setError(null);
+                      try {
+                        acceptSession(
+                          await api.loginWithGoogle({
+                            idToken: result.credential,
+                          }),
+                        );
+                      } catch (err) {
+                        setError(err);
+                      } finally {
+                        setBusy(false);
                       }
-                    />
-                  </div>
+                    }}
+                    onError={() =>
+                      setError(
+                        new Error(
+                          tr(
+                            "No se pudo iniciar sesión con Google.",
+                            "Google sign in failed.",
+                          ),
+                        ),
+                      )
+                    }
+                  />
                 </>
               )}
               <p className="auth-switch">

@@ -13,7 +13,9 @@ Copy-Item .env.example .env.local # solo si .env.local todavía no existe
 npm run dev
 ```
 
-Abre `http://localhost:5173`. En este equipo `.env.local` apunta al backend local en `http://127.0.0.1:8765` y conserva el identificador web de Google del proyecto móvil. `10.0.2.2` es la dirección usada desde el emulador de Android; no la uses para el proxy que ejecuta Vite en Windows. No sobrescribas ese archivo con el ejemplo si quieres conservar esa configuración.
+Abre `http://127.0.0.1:5173`. El proxy de desarrollo utiliza por defecto la API publicada en `https://jebryxapi-production.up.railway.app`; no necesitas iniciar un backend local. `.env.local` conserva el identificador web de Google del proyecto móvil. No sobrescribas ese archivo con el ejemplo si quieres conservar esa configuración.
+
+Para trabajar con un backend local, inicia JEBRYX_API y cambia `VITE_API_PROXY_TARGET` a `http://127.0.0.1:8765`. El error `ECONNREFUSED 127.0.0.1:8765` significa que no hay un backend escuchando en ese puerto: inicia ese servicio o vuelve a configurar la API publicada. Reinicia Vite después de cambiar `.env.local`. `10.0.2.2` solo corresponde al emulador de Android, no al proxy de Vite en Windows.
 
 Variables:
 
@@ -35,6 +37,8 @@ Las variables `VITE_*` son públicas y se integran al compilar. No colocar clave
 4. Conserva el mismo ID web en la lista `Google.clientIds` del backend (configurada mediante `GOOGLE_WEB_CLIENT_ID`). Reinicia Vite después de cambiar `.env.local`.
 
 El flujo actual usa el botón de Google con un callback JavaScript y envía `{ idToken }` a `POST /api/v1/auth/google`. No requiere una URI de redirección ni un secreto de cliente en el frontend. Consulta la [configuración oficial de Google](https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid).
+
+El botón oficial ocupa el ancho del formulario, usa bordes redondeados y adapta su tema claro u oscuro. Se activa `use_fedcm_for_button` para presentar el selector de cuentas del navegador en los navegadores compatibles. La selección automática está desactivada para permitir elegir la cuenta. Google y el navegador controlan el aspecto y la disponibilidad del selector; GIS conserva el flujo compatible cuando FedCM no está disponible. No se muestra One Tap automáticamente al abrir la página.
 
 Diagnóstico por etapa:
 

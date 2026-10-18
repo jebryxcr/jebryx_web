@@ -31,6 +31,23 @@ test("signs in with the existing API, logo and animated reveal", async ({
   expect(errors).toEqual([]);
 });
 
+test("switches login language and keeps it after a reload", async ({ page }) => {
+  const { errors } = await setup(page, false);
+  await ready(page, "/login");
+  await page.getByRole("button", { name: "Cambiar a inglés" }).click();
+  await expect(page.getByRole("heading", { name: "Good to see you again." })).toBeVisible();
+  await expect(page.getByLabel("Email address", { exact: true })).toBeVisible();
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  await page.reload();
+  await expect(page.locator(".brand-transition")).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Good to see you again." })).toBeVisible();
+  await page.getByRole("button", { name: "Switch to Spanish" }).click();
+  await expect(page.getByRole("heading", { name: "Qué bueno verte de nuevo." })).toBeVisible();
+  await expect(page.getByLabel("Correo electrónico", { exact: true })).toBeVisible();
+  await expect(page.locator("html")).toHaveAttribute("lang", "es");
+  expect(errors).toEqual([]);
+});
+
 test("registers and verifies the emailed code", async ({ page }) => {
   const { calls } = await setup(page, false);
   await ready(page, "/register");
@@ -55,6 +72,53 @@ test("registers and verifies the emailed code", async ({ page }) => {
     email: "test@example.com",
     code: "123456",
   });
+});
+
+test("handles Google's selected credential and rejects missing ID tokens", async ({
+  page,
+}) => {
+  const { calls, errors } = await setup(page, false);
+  // Replace only Google's external SDK. The app and its API client run normally.
+  await page.route("https://accounts.google.com/gsi/client*", (route) =>
+    route.fulfill({
+      contentType: "application/javascript",
+      body: `
+        (() => {
+        let configuration;
+        let attempts = 0;
+        window.google = { accounts: { id: {
+          initialize(options) { configuration = options; },
+          renderButton(container, options) {
+            const button = document.createElement('button');
+            button.textContent = 'Continuar con Google';
+            button.type = 'button';
+            button.onclick = () => configuration.callback(
+              attempts++ === 0 ? {} : { credential: 'selected-google-id-token' }
+            );
+            container.replaceChildren(button);
+          }
+        } } };
+        })();
+      `,
+    }),
+  );
+  await ready(page, "/login");
+  test.skip(
+    (await page.locator(".google-button").count()) === 0,
+    "Google sign-in requires VITE_GOOGLE_WEB_CLIENT_ID.",
+  );
+  const googleButton = page.getByRole("button", { name: "Continuar con Google" });
+  await googleButton.click();
+  await expect(page.getByText("No se pudo iniciar sesión con Google.")).toBeVisible();
+  expect(calls.filter((c) => c.path === "auth/google")).toHaveLength(0);
+  await googleButton.click();
+  await expect(page).toHaveURL(/\/$/);
+  const googleCalls = calls.filter((c) => c.path === "auth/google");
+  expect(googleCalls).toHaveLength(1);
+  expect(googleCalls[0].body).toEqual({ idToken: "selected-google-id-token" });
+  expect(googleCalls[0].headers).not.toHaveProperty("authorization");
+  expect(googleCalls[0].headers).not.toHaveProperty("x-profile-id");
+  expect(errors).toEqual([]);
 });
 
 test("recovers access with the three existing password endpoints", async ({

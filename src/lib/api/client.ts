@@ -82,6 +82,11 @@ export async function apiRequest<T = unknown>(
     );
   }
 
+  // CakePHP may return an HTML error page before JSON negotiation runs.
+  // Expire the session even when that response cannot be parsed as JSON.
+  if (response.status === 401 && token)
+    window.dispatchEvent(new Event("jebryx:unauthorized"));
+
   const text = await response.text();
   let data: any = null;
   if (text) {
@@ -96,8 +101,6 @@ export async function apiRequest<T = unknown>(
   }
 
   if (!response.ok) {
-    if (response.status === 401 && token)
-      window.dispatchEvent(new Event("jebryx:unauthorized"));
     const message =
       (data && (data.message as string)) ??
       "Ocurrió un error inesperado. Intenta de nuevo.";

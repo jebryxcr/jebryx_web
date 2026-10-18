@@ -13,7 +13,9 @@ export default defineConfig(({ mode }) => {
       port: 5173,
       proxy: {
         "/api": {
-          target: env.VITE_API_PROXY_TARGET || "http://localhost:8765",
+          target:
+            env.VITE_API_PROXY_TARGET ||
+            "https://jebryxapi-production.up.railway.app",
           changeOrigin: true,
         },
       },

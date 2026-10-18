@@ -80,6 +80,30 @@ describe("JEBRYX_API contract", () => {
     ).rejects.toBeInstanceOf(ApiError);
     expect(dispatchEvent.mock.calls[0][0].type).toBe("jebryx:unauthorized");
   });
+  it.each(["<html>Authentication is required to continue</html>", ""])(
+    "expires rejected sessions when the backend returns a non-JSON body: %s",
+    async (body) => {
+      const dispatchEvent = vi.fn();
+      vi.stubGlobal("window", { dispatchEvent });
+      vi.stubGlobal(
+        "fetch",
+        vi.fn().mockImplementation(
+          async () => new Response(body, { status: 401 }),
+        ),
+      );
+      await expect(
+        apiRequest("/api/v1/movimientos/resumen-saldo", { token: "rejected" }),
+      ).rejects.toMatchObject({ status: 401 });
+      expect(dispatchEvent).toHaveBeenCalledTimes(1);
+      expect(dispatchEvent.mock.calls[0][0].type).toBe("jebryx:unauthorized");
+
+      dispatchEvent.mockClear();
+      await expect(
+        apiRequest("/api/v1/auth/login", { method: "POST" }),
+      ).rejects.toMatchObject({ status: 401 });
+      expect(dispatchEvent).not.toHaveBeenCalled();
+    },
+  );
   it("normalizes nested IDs without changing monetary values or counts", () => {
     expect(
       normalizeIdentifiers({

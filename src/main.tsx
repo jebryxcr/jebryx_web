@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { GoogleOAuthProvider } from "@react-oauth/google";
 import "@fontsource/inter/400.css";
 import "@fontsource/inter/500.css";
 import "@fontsource/inter/600.css";
@@ -12,7 +11,6 @@ import i18n from "./i18n";
 import "./styles.css";
 import "./motion.css";
 import App from "./App";
-import { GOOGLE_WEB_CLIENT_ID } from "./lib/config";
 import { tokenExpired, usePrefs, useSession } from "./lib/store";
 import { ApiError } from "./lib/api/client";
 import { ToastProvider } from "./components/ui";
@@ -102,12 +100,6 @@ const content = (
 );
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    {GOOGLE_WEB_CLIENT_ID ? (
-      <GoogleOAuthProvider clientId={GOOGLE_WEB_CLIENT_ID}>
-        {content}
-      </GoogleOAuthProvider>
-    ) : (
-      content
-    )}
+    {content}
   </React.StrictMode>,
 );
