@@ -1,5 +1,11 @@
 import { test, expect } from "@playwright/test";
-import { profileA, profileB, ready, setup } from "./fixtures";
+import {
+  chooseSelectOption,
+  profileA,
+  profileB,
+  ready,
+  setup,
+} from "./fixtures";
 
 test("all sections render with the original branding and fit the viewport", async ({
   page,
@@ -49,11 +55,16 @@ test("creates and edits an expense using its category account, then deletes it",
   await ready(page, "/agregar");
   const dialog = page.getByRole("dialog");
   await dialog.getByLabel("Monto", { exact: true }).fill("3000");
-  await dialog.getByLabel("Categoría", { exact: true }).selectOption("cat1");
-  await expect(dialog.getByLabel("Cuenta", { exact: true })).toBeDisabled();
-  await expect(dialog.getByLabel("Moneda", { exact: true })).toHaveValue(
-    "crc1",
+  await chooseSelectOption(
+    dialog.getByLabel("Categoría", { exact: true }),
+    "cat1",
   );
+  await expect(
+    dialog.getByRole("combobox", { name: "Cuenta", exact: true }),
+  ).toHaveAttribute("aria-disabled", "true");
+  await expect(
+    dialog.getByLabel("Moneda", { exact: true }).and(dialog.locator("select")),
+  ).toHaveValue("crc1");
   await dialog.getByLabel("Descripción (opcional)").fill("Compra de prueba");
   await dialog.getByRole("button", { name: "Guardar", exact: true }).click();
   await expect(dialog).toHaveCount(0);
@@ -72,8 +83,8 @@ test("creates and edits an expense using its category account, then deletes it",
     descripcion: "Compra de prueba",
   });
   expect(created?.headers["x-profile-id"]).toBe(profileA);
-  const row = page.getByRole("row").filter({ hasText: "Compra de prueba" });
-  await row.getByRole("button", { name: "Editar", exact: true }).click();
+  const row = page.getByRole("article").filter({ hasText: "Compra de prueba" });
+  await row.locator(".movement-entry-main").click();
   await page
     .getByRole("dialog")
     .getByLabel("Monto", { exact: true })
@@ -122,8 +133,8 @@ test("creates accounts, linked categories and budgets with the existing API fiel
   await page.getByRole("button", { name: "Agregar", exact: true }).click();
   dialog = page.getByRole("dialog");
   await dialog.getByLabel("Nombre", { exact: true }).fill("Transporte web");
-  await dialog.getByLabel("Cuenta vinculada").selectOption("1");
-  await dialog.getByLabel("Icono", { exact: true }).selectOption("car");
+  await chooseSelectOption(dialog.getByLabel("Cuenta vinculada"), "1");
+  await chooseSelectOption(dialog.getByLabel("Icono", { exact: true }), "car");
   await dialog.getByRole("button", { name: "Guardar", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Transporte web" }),
@@ -134,8 +145,14 @@ test("creates accounts, linked categories and budgets with the existing API fiel
   await ready(page, "/presupuestos");
   await page.getByRole("button", { name: "Agregar", exact: true }).click();
   dialog = page.getByRole("dialog");
-  await dialog.getByLabel("Categoría", { exact: true }).selectOption("cat1");
-  await dialog.getByLabel("Moneda", { exact: true }).selectOption("crc1");
+  await chooseSelectOption(
+    dialog.getByLabel("Categoría", { exact: true }),
+    "cat1",
+  );
+  await chooseSelectOption(
+    dialog.getByLabel("Moneda", { exact: true }),
+    "crc1",
+  );
   await dialog.getByLabel("Límite mensual").fill("25000");
   await dialog.getByRole("button", { name: "Guardar", exact: true }).click();
   await expect(dialog).toHaveCount(0);
@@ -152,7 +169,10 @@ test("warns before overdrawing a numeric account ID and respects cancellation", 
   await ready(page, "/agregar");
   const dialog = page.getByRole("dialog");
   await dialog.getByLabel("Monto", { exact: true }).fill("200000");
-  await dialog.getByLabel("Categoría", { exact: true }).selectOption("cat1");
+  await chooseSelectOption(
+    dialog.getByLabel("Categoría", { exact: true }),
+    "cat1",
+  );
   page.once("dialog", async (prompt) => {
     expect(prompt.message()).toContain("saldo negativo");
     await prompt.dismiss();
@@ -192,7 +212,7 @@ test("isolates profile queries and persists language and theme per profile", asy
   await expect(
     page.getByRole("heading", { name: "Banco principal" }),
   ).toBeVisible();
-  await page.getByLabel("Perfil activo").selectOption(profileB);
+  await chooseSelectOption(page.getByLabel("Perfil activo"), profileB);
   await expect(
     page.getByRole("heading", { name: "Cuenta negocio" }),
   ).toBeVisible();
@@ -202,13 +222,13 @@ test("isolates profile queries and persists language and theme per profile", asy
     ),
   ).toBe(true);
   await ready(page, "/ajustes");
-  await page.getByRole("button", { name: "Oscuro", exact: true }).click();
+  await page.getByRole("radio", { name: "Oscuro", exact: true }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  await page.getByLabel("Idioma", { exact: true }).selectOption("en");
+  await chooseSelectOption(page.getByLabel("Idioma", { exact: true }), "en");
   await expect(
     page.getByRole("heading", { name: "Settings", level: 1 }),
   ).toBeVisible();
-  await page.getByLabel("Active profile").selectOption(profileA);
+  await chooseSelectOption(page.getByLabel("Active profile"), profileA);
   await expect(
     page.getByRole("heading", { name: "Ajustes", level: 1 }),
   ).toBeVisible();
@@ -257,7 +277,10 @@ test("generates AI reports explicitly and only completes actions after creating 
     ),
   ).toBe(false);
   const dialog = page.getByRole("dialog");
-  await dialog.getByLabel("Moneda", { exact: true }).selectOption("crc1");
+  await chooseSelectOption(
+    dialog.getByLabel("Moneda", { exact: true }),
+    "crc1",
+  );
   await dialog.getByRole("button", { name: "Guardar", exact: true }).click();
   await expect(page.getByText("Aplicada", { exact: true })).toBeVisible();
   const createIndex = calls.findIndex(
@@ -279,9 +302,10 @@ test("streams real coach protocol and sends the selected backend model", async (
 }) => {
   const { calls, errors } = await setup(page);
   await ready(page, "/coach");
-  await page
-    .getByLabel("Modelo del coach", { exact: true })
-    .selectOption("destello");
+  await chooseSelectOption(
+    page.getByLabel("Modelo del coach", { exact: true }),
+    "destello",
+  );
   await page
     .getByLabel("Mensaje para el coach")
     .fill("Ayúdame con mi presupuesto");

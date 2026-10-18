@@ -1,3 +1,4 @@
+import Select2 from "@/components/Select2";
 import { lazy, Suspense, useState } from "react";
 import {
   Link,
@@ -222,7 +223,7 @@ function Shell() {
               <label className="sr-only" htmlFor="active-profile">
                 {tr("Perfil activo", "Active profile")}
               </label>
-              <select
+              <Select2
                 id="active-profile"
                 value={session.active_profile_id}
                 onChange={(e) => {
@@ -235,7 +236,7 @@ function Shell() {
                     {p.name}
                   </option>
                 ))}
-              </select>
+              </Select2>
             </div>
           </div>
         </header>

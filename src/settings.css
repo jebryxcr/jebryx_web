@@ -1,0 +1,295 @@
+.appearance-picker {
+  margin: 22px 0;
+}
+.appearance-preview-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.appearance-choice {
+  --preview-screen: #f3f0ed;
+  --preview-panel: #fff;
+  --preview-line: #b9b3b0;
+  --preview-text: #24211f;
+  --preview-muted: #8c8581;
+  --preview-accent: #e94e1b;
+  background: #fff;
+  color: var(--preview-text);
+  padding: 8px;
+  border: 1px solid #e8e3df;
+  border-radius: 18px;
+  min-width: 0;
+  text-align: left;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+.appearance-choice.preview-dark {
+  --preview-screen: #171517;
+  --preview-panel: #282528;
+  --preview-line: #716d70;
+  --preview-text: #f3f0ed;
+  --preview-muted: #a5a0a3;
+  --preview-accent: #f05a23;
+  background: #242124;
+  border-color: #383438;
+}
+.appearance-choice.selected {
+  border-color: var(--accent);
+  box-shadow:
+    0 0 0 1px var(--accent),
+    0 3px 10px #0000000a;
+}
+.appearance-choice:hover {
+  box-shadow: 0 3px 14px #00000010;
+}
+.appearance-miniature {
+  display: block;
+  height: 92px;
+  background: var(--preview-screen);
+  padding: 10px;
+  border-radius: 13px;
+  overflow: hidden;
+}
+.appearance-mini-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 9px;
+  background: var(--preview-panel);
+  border-radius: 9px;
+}
+.appearance-mini-heading {
+  display: block;
+  width: 34%;
+  height: 4px;
+  background: var(--preview-text);
+  border-radius: 3px;
+}
+.appearance-mini-subtitle {
+  display: block;
+  width: 55%;
+  height: 3px;
+  margin-top: 5px;
+  background: var(--preview-line);
+  border-radius: 3px;
+}
+.appearance-mini-summary {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-top: 9px;
+}
+.appearance-mini-summary i:first-child {
+  width: 24px;
+  height: 8px;
+  border-radius: 8px;
+  background: var(--preview-accent);
+}
+.appearance-mini-summary i:last-child {
+  width: 26px;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--preview-muted);
+  opacity: 0.48;
+}
+.appearance-mini-rule {
+  height: 1px;
+  background: var(--preview-line);
+  opacity: 0.25;
+  margin: 6px 0;
+}
+.appearance-mini-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.appearance-mini-row i:first-child {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--preview-screen);
+}
+.appearance-mini-row i:last-child {
+  flex: 1;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--preview-line);
+  opacity: 0.65;
+}
+.appearance-choice-caption {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 5px 2px 0;
+  color: var(--preview-muted);
+}
+.appearance-choice-caption > span:first-of-type {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+.appearance-choice-caption strong {
+  font-size: 12px;
+  color: var(--preview-text);
+}
+.appearance-choice-caption small {
+  font-size: 9px;
+  color: var(--preview-muted);
+  line-height: 1.3;
+}
+.appearance-choice.selected .appearance-choice-caption > svg {
+  color: var(--accent);
+}
+.appearance-selection-mark {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid #a9aaa8;
+  border-radius: 50%;
+}
+.selected .appearance-selection-mark {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+.appearance-system {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 52px;
+  margin-top: 10px;
+  padding: 11px 14px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--muted);
+  text-align: left;
+}
+.appearance-system > span:first-of-type {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+.appearance-system strong {
+  font-size: 12px;
+  font-weight: 500;
+}
+.appearance-system small {
+  font-size: 10px;
+}
+.appearance-system.selected {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--text);
+}
+.appearance-system.selected > svg {
+  color: var(--accent);
+}
+.toggle-row {
+  cursor: pointer;
+  min-height: 68px;
+}
+.toggle-row > .preference-copy {
+  display: grid;
+  gap: 5px;
+  flex: 1;
+}
+.preference-copy > strong {
+  font-size: 12px;
+  font-weight: 500;
+}
+.preference-copy > small {
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.6;
+  max-width: 350px;
+}
+.toggle-row input[role="switch"] {
+  position: relative;
+  appearance: none;
+  -webkit-appearance: none;
+  display: block;
+  box-sizing: border-box;
+  width: 46px;
+  height: 28px;
+  min-width: 46px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--border);
+  background: #e2e5e0;
+  cursor: pointer;
+  transition:
+    background 0.18s,
+    border-color 0.18s;
+}
+.toggle-row input[role="switch"]::before {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  top: 2px;
+  left: 2px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px #00000014;
+  transition: transform 0.18s;
+}
+.toggle-row input[role="switch"]:checked {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.toggle-row input[role="switch"]:checked::before {
+  transform: translateX(18px);
+}
+[data-theme="dark"] .toggle-row input[role="switch"]:not(:checked) {
+  background: #34383a;
+  border-color: #454b4c;
+}
+.toggle-row input[role="switch"]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+@media (max-width: 600px) {
+  .appearance-miniature {
+    height: 76px;
+    padding: 8px;
+  }
+  .appearance-mini-panel {
+    padding: 7px;
+  }
+  .appearance-choice-caption {
+    gap: 5px;
+  }
+  .appearance-choice-caption > svg {
+    width: 15px;
+  }
+  .appearance-choice-caption strong {
+    font-size: 12px;
+  }
+  .appearance-choice-caption small {
+    font-size: 8px;
+  }
+  .appearance-system {
+    padding-inline: 10px;
+  }
+  .preference-copy > strong {
+    font-size: 11px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .toggle-row input[role="switch"],
+  .toggle-row input[role="switch"]::before {
+    transition: none;
+  }
+}

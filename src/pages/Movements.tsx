@@ -1,6 +1,18 @@
+import Select2 from "@/components/Select2";
+import DatePicker from "@/components/DatePicker";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { Download, Plus } from "lucide-react";
+import {
+  ArrowDownLeft,
+  ArrowUpRight,
+  CalendarDays,
+  Download,
+  Plus,
+  Search,
+  SlidersHorizontal,
+  Wallet,
+  X,
+} from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import {
   deleteMovimiento,
@@ -14,6 +26,7 @@ import {
   useProfileQuery,
   useRefresh,
   useText,
+  money,
 } from "@/lib/hooks";
 import {
   Button,
@@ -24,9 +37,13 @@ import {
   PageTitle,
   useToast,
 } from "@/components/ui";
-import MovementTable from "@/components/MovementTable";
+import MovementHistory, {
+  movementDay,
+  movementTotals,
+} from "@/components/MovementHistory";
 import Editor from "@/components/Editors";
 import { exportMovements } from "@/lib/export";
+import "@/movements.css";
 
 export default function Movements({ create = false }: { create?: boolean }) {
   const tr = useText();
@@ -47,8 +64,18 @@ export default function Movements({ create = false }: { create?: boolean }) {
   const [page, setPage] = useState(1);
   const [error, setError] = useState<unknown>(null);
   const [exporting, setExporting] = useState(false);
-  const { accounts, categories } = useCatalogs();
-  const filtered = !!(search || type || category || account || from || to);
+  const [showFilters, setShowFilters] = useState(false);
+  const [currency, setCurrency] = useState("");
+  const { accounts, categories, currencies } = useCatalogs();
+  const filtered = !!(
+    search ||
+    type ||
+    category ||
+    account ||
+    currency ||
+    from ||
+    to
+  );
   const query = useProfileQuery(["movimientos", page], (t, p) =>
     listMovimientos(t, p, page, 25),
   );
@@ -64,14 +91,12 @@ export default function Movements({ create = false }: { create?: boolean }) {
     () =>
       (filtered ? all.data || [] : query.data?.movimientos || []).filter(
         (m) => {
-          const date = (m.fecha || m.created_at || m.created || "").slice(
-            0,
-            10,
-          );
+          const date = movementDay(m);
           return (
             (!type || m.tipo === type) &&
             (!category || m.categoria_id === category) &&
             (!account || m.cuenta_id === account) &&
+            (!currency || m.moneda_id === currency) &&
             (!from || date >= from) &&
             (!to || date <= to) &&
             `${m.descripcion || m.description || ""} ${m.categoria?.nombre || ""} ${m.cuenta?.nombre || ""}`
@@ -80,9 +105,30 @@ export default function Movements({ create = false }: { create?: boolean }) {
           );
         },
       ),
-    [filtered, all.data, query.data, type, category, account, from, to, search],
+    [
+      filtered,
+      all.data,
+      query.data,
+      type,
+      category,
+      account,
+      currency,
+      from,
+      to,
+      search,
+    ],
   );
   const active = filtered ? all : query;
+  const totals = movementTotals(list);
+  const clearFilters = () => {
+    setSearch("");
+    setType("");
+    setCategory("");
+    setAccount("");
+    setCurrency("");
+    setFrom("");
+    setTo("");
+  };
   const close = () => {
     setEditor(null);
     if (create) navigate("/movimientos", { replace: true });
@@ -106,7 +152,7 @@ export default function Movements({ create = false }: { create?: boolean }) {
     }
   };
   return (
-    <>
+    <div className="movements-page">
       <PageTitle
         title={tr("Movimientos", "Transactions")}
         subtitle={tr(
@@ -144,93 +190,232 @@ export default function Movements({ create = false }: { create?: boolean }) {
         }
       />
       {error != null && <ErrorBox error={error} />}
-      <Card className="filter-card">
-        <div className="filters">
-          <input
-            type="search"
-            placeholder={tr("Buscar movimientos…", "Search transactions…")}
-            aria-label={tr("Buscar movimientos", "Search transactions")}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <select
-            aria-label={tr("Tipo", "Type")}
-            value={type}
-            onChange={(e) => setType(e.target.value)}
-          >
-            <option value="">{tr("Todos los tipos", "All types")}</option>
-            <option value="ingreso">{tr("Ingresos", "Income")}</option>
-            <option value="gasto">{tr("Gastos", "Expenses")}</option>
-          </select>
-          <select
-            aria-label={tr("Categoría", "Category")}
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            <option value="">
-              {tr("Todas las categorías", "All categories")}
-            </option>
-            {categories.data?.categorias.map((c) => (
-              <option value={c.id} key={c.id}>
-                {c.nombre}
-              </option>
-            ))}
-          </select>
-          <select
-            aria-label={tr("Cuenta", "Account")}
-            value={account}
-            onChange={(e) => setAccount(e.target.value)}
-          >
-            <option value="">{tr("Todas las cuentas", "All accounts")}</option>
-            {accounts.data?.cuentas.map((c) => (
-              <option value={c.id} key={c.id}>
-                {c.nombre}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="date-filters">
-          <Field label={tr("Desde", "From")}>
+      <div className="movement-summary-heading">
+        <span className="eyebrow">
+          {tr("TU ACTIVIDAD FINANCIERA", "YOUR FINANCIAL ACTIVITY")}
+        </span>
+        <span>
+          {filtered
+            ? tr("Resumen de los resultados", "Summary of results")
+            : tr("Resumen de esta página", "Summary of this page")}
+        </span>
+      </div>
+      <div className="movement-summary">
+        {(
+          [
+            {
+              label: tr("Ingresos", "Income"),
+              kind: "income",
+              icon: ArrowDownLeft,
+            },
+            {
+              label: tr("Gastos", "Expenses"),
+              kind: "expense",
+              icon: ArrowUpRight,
+            },
+            {
+              label: tr("Balance del período", "Period balance"),
+              kind: "balance",
+              icon: Wallet,
+            },
+          ] as const
+        ).map((item) => (
+          <section className={`movement-stat ${item.kind}`} key={item.kind}>
+            <div className="movement-stat-label">
+              <span>{item.label}</span>
+              <span className="movement-stat-icon">
+                <item.icon size={19} />
+              </span>
+            </div>
+            <div className="movement-stat-values">
+              {active.isPending || active.error || !totals.length ? (
+                <strong>—</strong>
+              ) : (
+                totals.map((total) => (
+                  <strong key={total.id} title={total.name}>
+                    {money(
+                      item.kind === "income"
+                        ? total.income
+                        : item.kind === "expense"
+                          ? total.expense
+                          : total.income - total.expense,
+                      total.symbol,
+                    )}
+                  </strong>
+                ))
+              )}
+            </div>
+            <small>
+              {item.kind === "income"
+                ? tr("Lo que entra", "Money coming in")
+                : item.kind === "expense"
+                  ? tr("Lo que sale", "Money going out")
+                  : tr("Ingresos menos gastos", "Income minus expenses")}
+            </small>
+          </section>
+        ))}
+      </div>
+      <Card className="movement-filter-card">
+        <div className="movement-toolbar">
+          <div className="movement-search">
+            <Search size={18} />
             <input
-              type="date"
+              type="search"
+              placeholder={tr("Buscar movimientos…", "Search transactions…")}
+              aria-label={tr("Buscar movimientos", "Search transactions")}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <div
+            className="movement-type-filters"
+            aria-label={tr("Tipo", "Type")}
+          >
+            {[
+              { value: "", label: tr("Todos", "All") },
+              { value: "ingreso", label: tr("Ingresos", "Income") },
+              { value: "gasto", label: tr("Gastos", "Expenses") },
+            ].map((item) => (
+              <button
+                type="button"
+                key={item.value}
+                aria-pressed={type === item.value}
+                className={type === item.value ? "selected" : ""}
+                onClick={() => setType(item.value)}
+              >
+                {item.value && (
+                  <span className={`movement-filter-dot ${item.value}`} />
+                )}
+                {item.label}
+              </button>
+            ))}
+          </div>
+          <Button
+            className={`secondary movement-filter-toggle ${showFilters ? "selected" : ""}`}
+            aria-expanded={showFilters}
+            aria-controls="movement-advanced-filters"
+            onClick={() => setShowFilters((value) => !value)}
+          >
+            <SlidersHorizontal size={16} />
+            {tr("Filtros", "Filters")}
+            {(category || account || currency || from || to) && (
+              <span className="movement-filter-count">
+                {
+                  [category, account, currency, from || to].filter(Boolean)
+                    .length
+                }
+              </span>
+            )}
+          </Button>
+        </div>
+        <div
+          id="movement-advanced-filters"
+          className="movement-advanced-filters"
+          hidden={!showFilters}
+        >
+          <Field label={tr("Categoría", "Category")}>
+            <Select2
+              aria-label={tr("Categoría", "Category")}
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+            >
+              <option value="">
+                {tr("Todas las categorías", "All categories")}
+              </option>
+              {categories.data?.categorias.map((c) => (
+                <option value={c.id} key={c.id}>
+                  {c.nombre}
+                </option>
+              ))}
+            </Select2>
+          </Field>
+          <Field label={tr("Cuenta", "Account")}>
+            <Select2
+              aria-label={tr("Cuenta", "Account")}
+              value={account}
+              onChange={(e) => setAccount(e.target.value)}
+            >
+              <option value="">
+                {tr("Todas las cuentas", "All accounts")}
+              </option>
+              {accounts.data?.cuentas.map((c) => (
+                <option value={c.id} key={c.id}>
+                  {c.nombre}
+                </option>
+              ))}
+            </Select2>
+          </Field>
+          <Field label={tr("Moneda", "Currency")}>
+            <Select2
+              value={currency}
+              onChange={(event) => setCurrency(event.target.value)}
+            >
+              <option value="">
+                {tr("Todas las monedas", "All currencies")}
+              </option>
+              {currencies.data?.monedas.map((item) => (
+                <option value={item.id} key={item.id}>
+                  {item.simbolo} · {item.nombre}
+                </option>
+              ))}
+            </Select2>
+          </Field>
+          <Field label={tr("Desde", "From")}>
+            <DatePicker
+              label={tr("Desde", "From")}
               value={from}
               max={to || undefined}
-              onChange={(e) => setFrom(e.target.value)}
+              onChange={setFrom}
             />
           </Field>
           <Field label={tr("Hasta", "To")}>
-            <input
-              type="date"
+            <DatePicker
+              label={tr("Hasta", "To")}
               value={to}
               min={from || undefined}
-              onChange={(e) => setTo(e.target.value)}
+              onChange={setTo}
             />
           </Field>
-          {filtered && (
-            <Button
-              className="ghost"
-              onClick={() => {
-                setSearch("");
-                setType("");
-                setCategory("");
-                setAccount("");
-                setFrom("");
-                setTo("");
-              }}
-            >
-              {tr("Limpiar filtros", "Clear filters")}
-            </Button>
-          )}
         </div>
+        {filtered && (
+          <div className="movement-filter-status">
+            <span>
+              <CalendarDays size={14} />
+              {from || to
+                ? `${from || "…"} — ${to || "…"}`
+                : tr("Filtros activos", "Filters active")}
+            </span>
+            <button type="button" onClick={clearFilters}>
+              <X size={13} />
+              {tr("Limpiar filtros", "Clear filters")}
+            </button>
+          </div>
+        )}
       </Card>
-      <Card className="table-card">
+      <section className="movement-history-shell">
+        <div className="movement-history-heading">
+          <div>
+            <h2>{tr("Tu historial", "Your history")}</h2>
+            <p>
+              {tr(
+                "Cada movimiento cuenta tu historia.",
+                "Every transaction tells your story.",
+              )}
+            </p>
+          </div>
+          <span>
+            {filtered ? list.length : (query.data?.meta?.total ?? list.length)}{" "}
+            {tr("movimientos", "transactions")}
+          </span>
+        </div>
         {active.isPending ? (
           <Loading />
         ) : active.error ? (
           <ErrorBox error={active.error} retry={() => void active.refetch()} />
         ) : (
-          <MovementTable
+          <MovementHistory
             movements={list}
+            categories={categories.data?.categorias || []}
             edit={setEditor}
             remove={(m) => void remove(m)}
           />
@@ -260,7 +445,7 @@ export default function Movements({ create = false }: { create?: boolean }) {
             </div>
           )}
         </div>
-      </Card>
+      </section>
       {editor && (
         <Editor
           kind="movimientos"
@@ -271,6 +456,6 @@ export default function Movements({ create = false }: { create?: boolean }) {
           close={close}
         />
       )}
-    </>
+    </div>
   );
 }

@@ -1,4 +1,4 @@
-import { type Page, expect } from "@playwright/test";
+import { type Page, type Locator, expect } from "@playwright/test";
 export const profileA = "11111111-1111-4111-8111-111111111111";
 export const profileB = "22222222-2222-4222-8222-222222222222";
 const token = `e30.${Buffer.from(JSON.stringify({ exp: 4102444800 })).toString("base64url")}.signature`;
@@ -443,4 +443,18 @@ export async function setup(page: Page, authenticated = true) {
 export async function ready(page: Page, path: string) {
   await page.goto(path);
   await expect(page.locator(".brand-transition")).toHaveCount(0);
+}
+
+/** Choose through the visible Select2 control, including controls inside dialogs. */
+export async function chooseSelectOption(labelled: Locator, value: string) {
+  const page = labelled.page();
+  const native = labelled.and(page.locator("select"));
+  const label = await native.evaluate(
+    (select: HTMLSelectElement, selected) =>
+      Array.from(select.options).find((option) => option.value === selected)
+        ?.textContent || "",
+    value,
+  );
+  await native.locator("..").getByRole("combobox").click();
+  await page.getByRole("option", { name: label, exact: true }).click();
 }

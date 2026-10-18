@@ -21,6 +21,7 @@ import { usePrefs } from "@/lib/store";
 import { ACCOUNT_CURRENCIES, currencyCode } from "@/lib/currency";
 import { ErrorBox, Loading, Modal, useToast } from "./ui";
 import { ResourceForm, type FieldSpec } from "./ResourceForm";
+import MovementForm from "./MovementForm";
 
 export type EditorKind =
   "cuentas" | "categorias" | "presupuestos" | "movimientos";
@@ -430,8 +431,15 @@ export default function Editor({
   };
   return (
     <Modal
-      title={`${record ? tr("Editar", "Edit") : tr("Crear", "Create")} ${names[kind]}`}
+      title={
+        kind === "movimientos"
+          ? record
+            ? tr("Editar movimiento", "Edit transaction")
+            : tr("Nuevo movimiento", "New transaction")
+          : `${record ? tr("Editar", "Edit") : tr("Crear", "Create")} ${names[kind]}`
+      }
       close={close}
+      className={kind === "movimientos" ? "movement-modal" : ""}
     >
       {loading ? (
         <Loading />
@@ -443,6 +451,16 @@ export default function Editor({
             void categories.refetch();
             void currencies.refetch();
           }}
+        />
+      ) : kind === "movimientos" ? (
+        <MovementForm
+          initial={normalize(initial, "initial")}
+          normalize={normalize}
+          onSave={save}
+          close={close}
+          accounts={accounts.data?.cuentas || []}
+          categories={categories.data?.categorias || []}
+          currencies={currencies.data?.monedas || []}
         />
       ) : (
         <ResourceForm

@@ -1,16 +1,8 @@
+import Select2 from "@/components/Select2";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  Download,
-  LogOut,
-  Monitor,
-  Moon,
-  Plus,
-  Star,
-  Sun,
-  UserRound,
-} from "lucide-react";
+import { Download, LogOut, Plus, Star, UserRound } from "lucide-react";
 import * as api from "@/lib/api/profiles";
 import type { Profile } from "@/lib/api/auth";
 import { listAllMovimientos } from "@/lib/api/movimientos";
@@ -30,6 +22,7 @@ import {
   useToast,
 } from "@/components/ui";
 import { ResourceForm } from "@/components/ResourceForm";
+import AppearancePicker from "@/components/AppearancePicker";
 
 function ProfileEditor({
   profile,
@@ -261,26 +254,12 @@ export default function Settings() {
                 "Choose how you want to see this profile.",
               )}
             </p>
-            <div className="theme-options">
-              {(
-                [
-                  ["light", tr("Claro", "Light"), Sun],
-                  ["dark", tr("Oscuro", "Dark"), Moon],
-                  ["system", tr("Sistema", "System"), Monitor],
-                ] as const
-              ).map(([value, label, Icon]) => (
-                <button
-                  key={value}
-                  className={prefs.theme === value ? "active" : ""}
-                  onClick={() => update({ theme: value })}
-                >
-                  <Icon size={23} />
-                  <span>{label}</span>
-                </button>
-              ))}
-            </div>
+            <AppearancePicker
+              value={prefs.theme}
+              onChange={(theme) => update({ theme })}
+            />
             <Field label={tr("Idioma", "Language")}>
-              <select
+              <Select2
                 value={prefs.language}
                 onChange={(e) =>
                   update({ language: e.target.value as "es" | "en" })
@@ -288,36 +267,57 @@ export default function Settings() {
               >
                 <option value="es">Español</option>
                 <option value="en">English</option>
-              </select>
+              </Select2>
             </Field>
           </Card>
           <Card>
             <h3>{tr("Notificaciones y coach", "Notifications & coach")}</h3>
             <label className="toggle-row">
-              <span>
-                {tr(
-                  "Advertencias de saldo y presupuesto",
-                  "Balance and budget warnings",
-                )}
+              <span className="preference-copy">
+                <strong>
+                  {tr(
+                    "Advertencias de saldo y presupuesto",
+                    "Balance and budget warnings",
+                  )}
+                </strong>
+                <small>
+                  {tr(
+                    "Recibe una advertencia antes de superar tu saldo o presupuesto.",
+                    "Get a warning before exceeding your balance or budget.",
+                  )}
+                </small>
               </span>
               <input
                 type="checkbox"
                 role="switch"
+                aria-label={tr(
+                  "Advertencias de saldo y presupuesto",
+                  "Balance and budget warnings",
+                )}
                 checked={prefs.budgetAlerts}
                 onChange={(e) => update({ budgetAlerts: e.target.checked })}
               />
             </label>
             <label className="toggle-row">
-              <span>{tr("Sugerencias del coach", "Coach nudges")}</span>
+              <span className="preference-copy">
+                <strong>{tr("Sugerencias del coach", "Coach nudges")}</strong>
+                <small>
+                  {tr(
+                    "Muestra consejos para acompañar tus decisiones financieras.",
+                    "Show tips to support your financial decisions.",
+                  )}
+                </small>
+              </span>
               <input
                 type="checkbox"
                 role="switch"
+                aria-label={tr("Sugerencias del coach", "Coach nudges")}
                 checked={prefs.coachNudges}
                 onChange={(e) => update({ coachNudges: e.target.checked })}
               />
             </label>
             <Field label={tr("Modelo del coach", "Coach model")}>
-              <select
+              <Select2
                 value={prefs.coachModel}
                 onChange={(e) =>
                   update({ coachModel: e.target.value as "sabio" | "destello" })
@@ -329,7 +329,7 @@ export default function Settings() {
                 <option value="destello">
                   {tr("Destello · respuesta rápida", "Flash · fast responses")}
                 </option>
-              </select>
+              </Select2>
             </Field>
             <NavRow onClick={() => navigate("/coach-usage")}>
               {tr("Uso del coach", "Coach usage")}

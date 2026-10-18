@@ -1,13 +1,8 @@
+import Select2 from "@/components/Select2";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  ArrowUp,
-  BarChart3,
-  MessageCircle,
-  Plus,
-  Trash2,
-} from "lucide-react";
+import { ArrowUp, BarChart3, MessageCircle, Plus, Trash2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import * as api from "@/lib/api/coach";
@@ -359,7 +354,7 @@ function Chat() {
                 </small>
               </div>
             </div>
-            <select
+            <Select2
               aria-label={tr("Modelo del coach", "Coach model")}
               value={prefs.coachModel}
               disabled={busy}
@@ -373,7 +368,7 @@ function Chat() {
               <option value="destello">
                 {tr("Destello · respuesta rápida", "Flash · fast responses")}
               </option>
-            </select>
+            </Select2>
           </div>
           <div className="chat-messages" aria-live="polite" aria-busy={busy}>
             {selected && detail.isPending ? (

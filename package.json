@@ -12,10 +12,13 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@daypicker/react": "^10.0.2",
     "@fontsource/inter": "^5.2.0",
     "@react-oauth/google": "^0.12.2",
     "@tanstack/react-query": "^5.90.0",
+    "date-fns": "^4.4.0",
     "i18next": "^26.3.1",
+    "jquery": "^3.7.1",
     "lucide-react": "^0.468.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
@@ -23,13 +26,16 @@
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.9.0",
     "remark-gfm": "^4.0.1",
+    "select2": "^4.1.0",
     "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@playwright/test": "^1.56.0",
+    "@types/jquery": "^4.0.1",
     "@types/node": "^24.0.0",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
+    "@types/select2": "^4.0.63",
     "@vitejs/plugin-react": "^5.0.0",
     "typescript": "~6.0.3",
     "vite": "^7.2.0",

@@ -1,3 +1,5 @@
+import Select2 from "@/components/Select2";
+import DatePicker from "@/components/DatePicker";
 import { useState, type FormEvent } from "react";
 import { Button, ErrorBox, Field } from "./ui";
 import { useText } from "@/lib/hooks";
@@ -83,7 +85,7 @@ export function ResourceForm({
         return (
           <Field key={f.name} label={f.label} hint={f.hint}>
             {f.options ? (
-              <select
+              <Select2
                 required={f.required}
                 disabled={f.disabledWhen?.(values)}
                 value={value}
@@ -94,7 +96,15 @@ export function ResourceForm({
                     {o.label}
                   </option>
                 ))}
-              </select>
+              </Select2>
+            ) : f.type === "date" ? (
+              <DatePicker
+                label={f.label}
+                value={value}
+                onChange={change}
+                required={f.required}
+                disabled={f.disabledWhen?.(values)}
+              />
             ) : f.type === "textarea" ? (
               <textarea
                 value={value}
