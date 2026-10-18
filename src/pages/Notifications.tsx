@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useConfirm } from "@/components/Confirmation";
 import { Bell, Check, CheckCheck, Trash2 } from "lucide-react";
 import {
   deleteNotificacion,
@@ -24,6 +25,7 @@ import {
 
 export default function Notifications() {
   const tr = useText();
+  const confirm = useConfirm();
   const { token, profileId } = useCredentials();
   const notifications = useProfileQuery(["notificaciones"], listNotificaciones);
   const refresh = useRefresh();
@@ -138,14 +140,15 @@ export default function Notifications() {
                 <IconButton
                   disabled={busy}
                   label={tr("Eliminar notificación", "Delete notification")}
-                  onClick={() => {
+                  onClick={async () => {
                     if (
-                      window.confirm(
-                        tr(
+                      await confirm({
+                        title: tr("Eliminar notificación", "Delete notification"),
+                        message: tr(
                           "¿Eliminar esta notificación?",
                           "Delete this notification?",
                         ),
-                      )
+                      })
                     )
                       void run(() =>
                         deleteNotificacion(token, profileId, n.id),

@@ -102,8 +102,8 @@ test("creates and edits an expense using its category account, then deletes it",
         c.body.monto === "3500",
     ),
   ).toBe(true);
-  page.once("dialog", (dialog) => dialog.accept());
   await row.getByRole("button", { name: "Eliminar", exact: true }).click();
+  await page.getByRole("alertdialog").getByRole("button", { name: "Eliminar", exact: true }).click();
   await expect(page.getByText("Compra de prueba", { exact: true })).toHaveCount(
     0,
   );
@@ -173,11 +173,10 @@ test("warns before overdrawing a numeric account ID and respects cancellation", 
     dialog.getByLabel("Categoría", { exact: true }),
     "cat1",
   );
-  page.once("dialog", async (prompt) => {
-    expect(prompt.message()).toContain("saldo negativo");
-    await prompt.dismiss();
-  });
   await dialog.getByRole("button", { name: "Guardar", exact: true }).click();
+  const warning = page.getByRole("alertdialog");
+  await expect(warning).toContainText("saldo negativo");
+  await warning.getByRole("button", { name: "Cancelar", exact: true }).click();
   await expect(dialog).toBeVisible();
   expect(
     calls.filter((c) => c.path === "movimientos" && c.method === "POST"),
@@ -239,10 +238,10 @@ test("isolates profile queries and persists language and theme per profile", asy
 test("records recurring payments and pauses plans", async ({ page }) => {
   const { calls } = await setup(page);
   await ready(page, "/recurrentes");
-  page.once("dialog", (d) => d.accept());
   await page
     .getByRole("button", { name: "Registrar pago", exact: true })
     .click();
+  await page.getByRole("alertdialog").getByRole("button", { name: "Registrar pago", exact: true }).click();
   await expect
     .poll(
       () =>
@@ -338,8 +337,8 @@ test("marks notifications read and removes them", async ({ page }) => {
     calls.find((c) => c.path === "notificaciones/n1" && c.method === "PATCH")
       ?.body,
   ).toEqual({ leida: true });
-  page.once("dialog", (d) => d.accept());
   await page.getByRole("button", { name: "Eliminar notificación" }).click();
+  await page.getByRole("alertdialog").getByRole("button", { name: "Eliminar", exact: true }).click();
   await expect(page.getByText("Todo al día", { exact: true })).toBeVisible();
 });
 

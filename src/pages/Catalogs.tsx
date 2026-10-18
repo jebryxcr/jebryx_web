@@ -44,6 +44,7 @@ import {
   useToast,
 } from "@/components/ui";
 import Editor, { type EditorKind } from "@/components/Editors";
+import { useConfirm } from "@/components/Confirmation";
 
 export default function Catalogs({
   kind,
@@ -54,6 +55,7 @@ export default function Catalogs({
   const { token, profileId } = useCredentials();
   const refresh = useRefresh();
   const toast = useToast();
+  const confirm = useConfirm();
   const [editor, setEditor] = useState<{
     kind: EditorKind;
     record?: Cuenta | Categoria | Presupuesto;
@@ -80,12 +82,17 @@ export default function Catalogs({
         : tr("Presupuestos", "Budgets");
   const remove = async (id: string) => {
     if (
-      !window.confirm(
-        tr(
+      !(await confirm({
+        title: kind === "cuentas"
+          ? tr("Eliminar cuenta", "Delete account")
+          : kind === "categorias"
+            ? tr("Eliminar categoría", "Delete category")
+            : tr("Eliminar presupuesto", "Delete budget"),
+        message: tr(
           "¿Eliminar este registro? Esta acción no se puede deshacer.",
           "Delete this record? This cannot be undone.",
         ),
-      )
+      }))
     )
       return;
     try {

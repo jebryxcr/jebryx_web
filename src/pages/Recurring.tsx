@@ -26,12 +26,14 @@ import {
   useToast,
 } from "@/components/ui";
 import { ResourceForm, type FieldSpec } from "@/components/ResourceForm";
+import { useConfirm } from "@/components/Confirmation";
 
 export default function Recurring() {
   const tr = useText();
   const { token, profileId } = useCredentials();
   const refresh = useRefresh();
   const toast = useToast();
+  const confirm = useConfirm();
   const plans = useProfileQuery(
     ["planes-recurrentes"],
     api.listarPlanesRecurrentes,
@@ -243,14 +245,15 @@ export default function Recurring() {
                   </span>
                   <EditActions
                     edit={() => setEditor(plan)}
-                    remove={() => {
+                    remove={async () => {
                       if (
-                        window.confirm(
-                          tr(
+                        await confirm({
+                          title: tr("Eliminar plan", "Delete plan"),
+                          message: tr(
                             "¿Eliminar el plan? Los pagos registrados se conservan.",
                             "Delete the plan? Recorded payments will be kept.",
                           ),
-                        )
+                        })
                       )
                         void run(plan.id, () =>
                           api.eliminarPlanRecurrente(token, profileId, plan.id),
@@ -295,14 +298,17 @@ export default function Recurring() {
                     className="secondary small"
                     busy={busy === plan.id}
                     disabled={!plan.active || complete || busy != null}
-                    onClick={() => {
+                    onClick={async () => {
                       if (
-                        window.confirm(
-                          tr(
+                        await confirm({
+                          title: tr("Registrar pago", "Record payment"),
+                          tone: "primary",
+                          confirmLabel: tr("Registrar pago", "Record payment"),
+                          message: tr(
                             "¿Registrar este pago y descontarlo de la cuenta?",
                             "Record this payment and deduct it from the account?",
                           ),
-                        )
+                        })
                       )
                         void run(plan.id, () =>
                           api.registrarPagoRecurrente(

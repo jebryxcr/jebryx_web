@@ -25,12 +25,14 @@ export function ResourceForm({
   close,
   label,
   normalize,
+  destructive = false,
 }: {
   fields: FieldSpec[];
   initial?: Record<string, string>;
   onSave: (values: Record<string, string>) => Promise<void>;
   close: () => void;
   label?: string;
+  destructive?: boolean;
   normalize?: (
     values: Record<string, string>,
     changed: string,
@@ -136,7 +138,7 @@ export function ResourceForm({
         >
           {tr("Cancelar", "Cancel")}
         </Button>
-        <Button type="submit" busy={busy}>
+        <Button type="submit" busy={busy} className={destructive ? "danger" : ""}>
           {label || tr("Guardar", "Save")}
         </Button>
       </div>

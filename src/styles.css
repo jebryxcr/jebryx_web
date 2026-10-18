@@ -1070,6 +1070,83 @@ td:first-child {
 .modal .field {
   margin-bottom: 17px;
 }
+.modal-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+.confirmation-modal {
+  padding: 28px;
+  border-radius: 24px;
+}
+.confirmation-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 48px;
+  height: 48px;
+  border-radius: 16px;
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.confirmation-danger .confirmation-icon {
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 12%, var(--surface));
+}
+.confirmation-warning .confirmation-icon {
+  color: #a66a0a;
+  background: #f8edd8;
+}
+[data-theme="dark"] .confirmation-warning .confirmation-icon {
+  color: #efc16d;
+  background: #382f20;
+}
+.confirmation-modal .modal-head h2 {
+  font-size: 19px;
+  line-height: 1.35;
+}
+.confirmation-message {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.confirmation-actions,
+.confirmation-modal .form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 26px;
+  padding-top: 22px;
+  border-top: 1px solid var(--border);
+}
+.confirmation-actions .button,
+.confirmation-modal .form-actions .button {
+  flex: 1 1 150px;
+}
+.confirmation-modal .resource-form {
+  margin-top: 22px;
+}
+.confirmation-modal .button {
+  white-space: normal;
+}
+.button.danger {
+  background: #b34236;
+  color: #fff;
+  border-color: transparent;
+}
+.button.danger:hover:not(:disabled) {
+  background: #98372d;
+}
+[data-theme="dark"] .button.danger {
+  background: #ef9e91;
+  color: #34130e;
+}
+[data-theme="dark"] .button.danger:hover:not(:disabled) {
+  background: #f7b4a9;
+}
 .modal .field > span {
   font-size: 11px;
 }

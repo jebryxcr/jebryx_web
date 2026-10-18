@@ -22,6 +22,7 @@ import { ACCOUNT_CURRENCIES, currencyCode } from "@/lib/currency";
 import { ErrorBox, Loading, Modal, useToast } from "./ui";
 import { ResourceForm, type FieldSpec } from "./ResourceForm";
 import MovementForm from "./MovementForm";
+import { useConfirm } from "./Confirmation";
 
 export type EditorKind =
   "cuentas" | "categorias" | "presupuestos" | "movimientos";
@@ -44,6 +45,7 @@ export default function Editor({
   const { accounts, categories, currencies } = useCatalogs();
   const refresh = useRefresh();
   const toast = useToast();
+  const confirm = useConfirm();
   const { prefs } = usePrefs();
   const accountOptions = [
     { value: "", label: tr("Selecciona una cuenta", "Select an account") },
@@ -385,12 +387,15 @@ export default function Editor({
         if (
           account &&
           adjusted < Number(v.monto) &&
-          !window.confirm(
-            tr(
+          !(await confirm({
+            title: tr("La cuenta quedará en negativo", "The account will go negative"),
+            tone: "warning",
+            confirmLabel: tr("Continuar con el gasto", "Continue with expense"),
+            message: tr(
               "Este gasto dejará la cuenta con saldo negativo. ¿Deseas continuar?",
               "This expense will leave a negative account balance. Continue?",
             ),
-          )
+          }))
         )
           return;
         const { presupuestos } = await listPresupuestos(token, profileId);
@@ -408,12 +413,15 @@ export default function Editor({
         if (
           budget &&
           spent + Number(v.monto) > Number(budget.monto) &&
-          !window.confirm(
-            tr(
+          !(await confirm({
+            title: tr("Superarás tu presupuesto", "You'll exceed your budget"),
+            tone: "warning",
+            confirmLabel: tr("Continuar con el gasto", "Continue with expense"),
+            message: tr(
               "Este gasto supera tu presupuesto mensual. ¿Deseas continuar?",
               "This expense exceeds your monthly budget. Continue?",
             ),
-          )
+          }))
         )
           return;
       }

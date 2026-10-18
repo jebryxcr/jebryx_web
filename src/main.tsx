@@ -14,6 +14,7 @@ import App from "./App";
 import { tokenExpired, usePrefs, useSession } from "./lib/store";
 import { ApiError } from "./lib/api/client";
 import { ToastProvider } from "./components/ui";
+import { ConfirmationProvider } from "./components/Confirmation";
 import { MotionRoot, animateTheme } from "./components/Motion";
 
 const queryClient = new QueryClient({
@@ -84,7 +85,9 @@ function Runtime() {
   }, []);
   return (
     <MotionRoot>
-      <App />
+      <ConfirmationProvider>
+        <App />
+      </ConfirmationProvider>
     </MotionRoot>
   );
 }

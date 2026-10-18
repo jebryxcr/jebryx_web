@@ -44,6 +44,7 @@ import MovementHistory, {
 import Editor from "@/components/Editors";
 import { exportMovements } from "@/lib/export";
 import "@/movements.css";
+import { useConfirm } from "@/components/Confirmation";
 
 export default function Movements({ create = false }: { create?: boolean }) {
   const tr = useText();
@@ -52,6 +53,7 @@ export default function Movements({ create = false }: { create?: boolean }) {
   const { token, profileId } = useCredentials();
   const refresh = useRefresh();
   const toast = useToast();
+  const confirm = useConfirm();
   const [editor, setEditor] = useState<Movimiento | "new" | null>(
     create ? "new" : null,
   );
@@ -85,7 +87,7 @@ export default function Movements({ create = false }: { create?: boolean }) {
     enabled: filtered,
   });
   useEffect(() => {
-    if (create) setEditor("new");
+    setEditor(create ? "new" : null);
   }, [create]);
   const list = useMemo(
     () =>
@@ -135,12 +137,13 @@ export default function Movements({ create = false }: { create?: boolean }) {
   };
   const remove = async (m: Movimiento) => {
     if (
-      !window.confirm(
-        tr(
+      !(await confirm({
+        title: tr("Eliminar movimiento", "Delete transaction"),
+        message: tr(
           "¿Eliminar este movimiento? También se actualizará el saldo de la cuenta.",
           "Delete this transaction? The account balance will also be updated.",
         ),
-      )
+      }))
     )
       return;
     try {

@@ -187,16 +187,25 @@ export function EditActions({
     </div>
   );
 }
+const openModals = new Set<HTMLDialogElement>();
+let bodyOverflow = "";
+
 export function Modal({
   title,
   children,
   close,
   className = "",
+  role = "dialog",
+  descriptionId,
+  icon,
 }: {
   title: string;
   children: ReactNode;
   close: () => void;
   className?: string;
+  role?: "dialog" | "alertdialog";
+  descriptionId?: string;
+  icon?: ReactNode;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   const id = useId();
@@ -204,21 +213,34 @@ export function Modal({
   const motionReady = useMotionReady();
   useEffect(() => {
     if (!motionReady) return;
-    ref.current?.showModal();
+    const previousFocus = document.activeElement;
     const el = ref.current;
-    const previous = document.body.style.overflow;
+    if (!el) return;
+    el?.showModal();
+    el?.querySelector<HTMLElement>("[data-modal-autofocus]")?.focus();
+    if (!openModals.size) bodyOverflow = document.body.style.overflow;
+    openModals.add(el);
     document.body.style.overflow = "hidden";
     return () => {
       el?.close();
-      document.body.style.overflow = previous;
+      openModals.delete(el);
+      if (!openModals.size) document.body.style.overflow = bodyOverflow;
+      if (previousFocus instanceof HTMLElement && previousFocus.isConnected)
+        previousFocus.focus({ preventScroll: true });
     };
   }, [motionReady]);
   return (
     <dialog
       ref={ref}
       className={`modal ${className}`}
+      role={role}
+      aria-modal="true"
       aria-labelledby={id}
-      onCancel={close}
+      aria-describedby={descriptionId}
+      onCancel={(e) => {
+        e.preventDefault();
+        close();
+      }}
       onClick={(e) => {
         if (e.target !== e.currentTarget) return;
         // Select2 removes its options after selection. A subsequent touch click
@@ -234,7 +256,10 @@ export function Modal({
       }}
     >
       <div className="modal-head">
-        <h2 id={id}>{title}</h2>
+        <div className="modal-heading">
+          {icon}
+          <h2 id={id}>{title}</h2>
+        </div>
         <IconButton label={tr("Cerrar", "Close")} onClick={close}>
           <X size={20} />
         </IconButton>

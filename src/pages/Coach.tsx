@@ -27,6 +27,7 @@ import {
 import SuggestedAction from "@/components/SuggestedAction";
 import { CoachAvatar } from "@/components/Brand";
 import { LoadingDots } from "@/components/Motion";
+import { useConfirm } from "@/components/Confirmation";
 
 function Usage() {
   const tr = useText();
@@ -149,6 +150,7 @@ function Usage() {
 
 function Chat() {
   const tr = useText();
+  const confirm = useConfirm();
   const { token, profileId } = useCredentials();
   const { prefs, update } = usePrefs();
   const client = useQueryClient();
@@ -250,12 +252,13 @@ function Chat() {
   const remove = async (id: string) => {
     if (
       busy ||
-      !window.confirm(
-        tr(
+      !(await confirm({
+        title: tr("Eliminar conversación", "Delete conversation"),
+        message: tr(
           "¿Eliminar esta conversación y todos sus mensajes?",
           "Delete this conversation and all its messages?",
         ),
-      )
+      }))
     )
       return;
     try {

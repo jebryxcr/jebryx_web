@@ -2,7 +2,7 @@ import Select2 from "@/components/Select2";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Download, LogOut, Plus, Star, UserRound } from "lucide-react";
+import { Download, LogOut, Plus, Star, Trash2, UserRound } from "lucide-react";
 import * as api from "@/lib/api/profiles";
 import type { Profile } from "@/lib/api/auth";
 import { listAllMovimientos } from "@/lib/api/movimientos";
@@ -428,8 +428,11 @@ export default function Settings() {
         <Modal
           title={tr("Eliminar perfil", "Delete profile")}
           close={() => setDeleting(null)}
+          className="confirmation-modal confirmation-danger"
+          descriptionId="delete-profile-description"
+          icon={<span className="confirmation-icon"><Trash2 size={24} /></span>}
         >
-          <p>
+          <p className="confirmation-message" id="delete-profile-description">
             {tr(
               `Se eliminarán el perfil «${deleting.name}» y todos sus datos financieros. Escribe el nombre exacto para confirmar.`,
               `The profile “${deleting.name}” and all its financial data will be deleted. Type the exact name to confirm.`,
@@ -445,6 +448,7 @@ export default function Settings() {
             ]}
             close={() => setDeleting(null)}
             label={tr("Eliminar definitivamente", "Delete permanently")}
+            destructive
             onSave={async (v) => {
               if (v.confirm_name !== deleting.name)
                 throw new Error(
