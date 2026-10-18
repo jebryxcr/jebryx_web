@@ -80,7 +80,7 @@ El respaldo cifrado y la importación CSV/Excel permanecen señalados como próx
 
 Los módulos de `src/lib/api/` provienen de la app móvil y conservan métodos, campos y rutas. Las peticiones financieras incluyen `Authorization: Bearer …`, `X-Profile-Id` y `X-Timezone`. Las de autenticación y gestión de perfiles no envían `X-Profile-Id`.
 
-Vite evita el problema de CORS en desarrollo mediante un proxy que reenvía al backend real. No se modificó el repositorio `jebryx_api`. Si la app muestra un error de conexión, revisa que la URL configurada sea accesible desde esta máquina; la comprobación inicial de `/api/v1/health` agotó el tiempo de espera en este entorno.
+Vite evita el problema de CORS en desarrollo mediante un proxy que reenvía al backend real. En Vercel, `vercel.json` reenvía `/api/*` al mismo JEBRYX_API publicado en `https://jebryxapi-production.up.railway.app`. No se modificó el repositorio `jebryx_api`.
 
 ## Producción
 
@@ -90,11 +90,17 @@ npm run build
 
 Publica el contenido de `dist/` en tu hosting. Configura el servidor para devolver `index.html` en las rutas de la aplicación. El proxy de Vite existe **solo en desarrollo**.
 
-En Vercel, `vercel.json` configura esa reescritura para que abrir o recargar `/login`, `/register` y las demás rutas cargue la aplicación y React Router resuelva la pantalla. Usa el preset **Vite**, el comando `npm run build` y el directorio de salida `dist`. El archivo debe incluirse en el commit que despliegas; volver a desplegar un commit anterior no aplica la corrección. Después del despliegue, comprueba el acceso directo y la recarga de `/login`.
+En Vercel, `vercel.json` aplica primero el proxy de API y después la reescritura de las pantallas a `index.html`. Así `/api/v1/auth/google` llega a Railway, mientras que abrir o recargar `/login`, `/register` y las demás rutas carga la aplicación. Las respuestas de API no se almacenan en la caché de Vercel.
+
+Usa el preset **Vite**, el comando `npm run build` y el directorio de salida `dist`. Mantén `VITE_API_URL` vacía o elimina esa variable del proyecto de Vercel para usar el proxy configurado. `VITE_API_PROXY_TARGET` solo afecta el desarrollo local.
+
+Incluye `vercel.json` en el commit que despliegas y realiza un nuevo despliegue de ese commit. Volver a desplegar un commit anterior no aplica la corrección. Comprueba `https://jebryx-web.vercel.app/api/v1/health`: debe devolver JSON con `service: "jebryx-api"`, no HTML. Comprueba también el acceso directo y la recarga de `/login`.
+
+El error `POST /api/v1/auth/google 405` aparece si la petición de autenticación cae en el fallback estático `index.html` en lugar de llegar al backend. Ese error no comprueba el estado de la base de datos; primero hay que corregir el enrutamiento hacia la API.
 
 Opciones para conectar la misma API en producción:
 
-1. Mantener `VITE_API_URL=` y configurar un reverse proxy `/api/` en el dominio web hacia JEBRYX_API. El proxy debe preservar `Authorization`, `X-Profile-Id` y `X-Timezone`, y desactivar el buffering en el streaming del coach.
+1. Mantener `VITE_API_URL=` y usar un reverse proxy `/api/` en el dominio web hacia JEBRYX_API. Ya está configurado en `vercel.json` para Railway. En otros proveedores, el proxy debe preservar `Authorization`, `X-Profile-Id` y `X-Timezone`, y permitir el streaming del coach sin buffering.
 2. Establecer `VITE_API_URL=https://tu-api.example.com` antes de compilar. El servidor de esa API debe permitir el origen web mediante CORS, los métodos GET/POST/PATCH/DELETE/OPTIONS y los encabezados Authorization, Content-Type, Accept, X-Profile-Id y X-Timezone.
 
 Para Google, agrega también el origen HTTPS del sitio al mismo cliente OAuth web y conserva el audience que valida JEBRYX_API.
