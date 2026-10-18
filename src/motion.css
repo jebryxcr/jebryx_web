@@ -1,0 +1,743 @@
+/* Animation timings and artwork are ported from the native Jebryx components. */
+.official-logo {
+  display: block;
+  object-fit: contain;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.brand > .official-logo {
+  border-radius: 9px;
+}
+.brand > span {
+  letter-spacing: -1.2px;
+  font-weight: 700;
+}
+.auth-form-logo {
+  margin: 0 0 24px;
+  animation: logo-entrance 700ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+.illustration-symbol {
+  font-size: inherit;
+  transform: rotate(-5deg);
+  animation: logo-breath 4400ms ease-in-out infinite;
+}
+.illustration-symbol .official-logo {
+  border-radius: 22px;
+  box-shadow: 0 20px 40px #001f1550;
+}
+.auth-story .brand > .official-logo {
+  width: 46px;
+  height: 46px;
+}
+.sidebar-coach > .coach-avatar {
+  margin-bottom: 12px;
+}
+.coach-avatar {
+  flex-shrink: 0;
+  display: block;
+}
+.coach-spark:has(.coach-avatar) {
+  background: transparent;
+}
+.loading-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  color: inherit;
+}
+.loading-dots > i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: loading-dot 800ms ease-in-out infinite;
+}
+.loading-dots > i:nth-child(2) {
+  animation-delay: 120ms;
+}
+.loading-dots > i:nth-child(3) {
+  animation-delay: 240ms;
+}
+@keyframes loading-dot {
+  0%,
+  70%,
+  100% {
+    opacity: 0.45;
+    transform: translateY(2px);
+  }
+  35% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+.brand-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  pointer-events: auto;
+}
+.boot-transition {
+  background: #061c17;
+  animation: boot-exit 650ms linear 3800ms both;
+  color: #f0f8f4;
+}
+.transition-center {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  z-index: 2;
+}
+.boot-transition .transition-center {
+  transform: translateY(-60px);
+}
+.transition-emblem {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 220px;
+  height: 220px;
+}
+.transition-logo {
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 18px 28px #0006);
+  overflow: hidden;
+  border-radius: 8px;
+}
+.boot-transition .transition-logo {
+  animation: boot-logo 2500ms linear both;
+}
+.transition-logo .official-logo {
+  width: 100%;
+  height: 100%;
+}
+.boot-glow {
+  position: absolute;
+  width: min(165vw, 1400px);
+  height: min(165vw, 1400px);
+  object-fit: contain;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -55%);
+  opacity: 0.26;
+  filter: hue-rotate(-60deg);
+  animation:
+    glow-atmosphere 3800ms linear both,
+    glow-breath 4400ms ease-in-out infinite;
+}
+.boot-horizon {
+  position: absolute;
+  top: 76%;
+  left: 18%;
+  right: 18%;
+  height: 1px;
+  background: #53caa2;
+  opacity: 0.09;
+}
+.boot-landscape {
+  position: absolute;
+  width: 220vw;
+  height: 120vw;
+  left: -85vw;
+  top: 80%;
+  border: 1px solid #1f795c;
+  border-radius: 9999px;
+  background: #1247351f;
+  opacity: 0.5;
+  transform: rotate(-16deg);
+  animation: landscape-breath 4400ms ease-in-out infinite;
+}
+.boot-landscape.second {
+  left: -35vw;
+  top: 84%;
+  opacity: 0.38;
+  transform: rotate(-4deg);
+}
+.boot-landscape.third {
+  top: 88%;
+  opacity: 0.26;
+  transform: rotate(8deg);
+}
+.transition-orbit {
+  position: absolute;
+  border: 1px solid #71e0b133;
+  border-radius: 50%;
+  width: 296px;
+  height: 296px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  animation: boot-orbit 3800ms linear both;
+  pointer-events: none;
+}
+.transition-orbit.second {
+  width: 352px;
+  height: 352px;
+  animation-name: boot-orbit-second;
+}
+.transition-orbit > i {
+  position: relative;
+  top: -3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #8ce9c6;
+  box-shadow: 0 0 8px #60ffc0e6;
+}
+.transition-orbit.second > i {
+  width: 4px;
+  height: 4px;
+  top: -2px;
+  opacity: 0.65;
+}
+.boot-particle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  background: #67efc1;
+  border-radius: 4px;
+  animation: boot-particle 3300ms linear var(--delay) both;
+  pointer-events: none;
+}
+.boot-particle:nth-of-type(4n) {
+  background: #d1e7b5;
+}
+.logo-sheen {
+  position: absolute;
+  left: 0;
+  top: -40%;
+  height: 180%;
+  width: 58px;
+  background: #dcfff11f;
+  transform: translateX(-220px) rotate(-24deg);
+  opacity: 0;
+  animation: boot-sheen 1300ms linear 1200ms both;
+}
+.logo-sheen:after {
+  content: "";
+  display: block;
+  width: 18px;
+  height: 100%;
+  margin: auto;
+  background: #ffffff2e;
+}
+.transition-signature {
+  position: absolute;
+  top: 252px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 400px;
+  max-width: 95vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.transition-wordmark {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 42px;
+  font-weight: 700;
+  line-height: 58px;
+  letter-spacing: -1px;
+}
+.transition-wordmark > span {
+  display: block;
+  animation: wordmark-letter 550ms linear var(--letter-delay) both;
+}
+.transition-wordmark > span:last-child {
+  color: #57e2b1;
+}
+.transition-rule {
+  width: 32px;
+  height: 2px;
+  border-radius: 1px;
+  background: #57e2b1;
+  margin-top: 14px;
+  animation: signature-rule 850ms linear 2050ms both;
+}
+.transition-signature p {
+  color: #a3c3b7;
+  font-size: 13px;
+  line-height: 22px;
+  letter-spacing: 0.5px;
+  padding: 4px 12px;
+  margin-top: 15px;
+  animation: tagline-in 700ms linear 2350ms both;
+}
+.transition-footer {
+  position: absolute;
+  bottom: 36px;
+  left: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 5px;
+  color: #80a395;
+  animation: tagline-in 700ms linear 2800ms both;
+}
+.transition-footer > span:last-child {
+  font-size: 9px;
+  letter-spacing: 2.4px;
+  text-transform: uppercase;
+  line-height: 16px;
+}
+.transition-footer .loading-dots {
+  color: #71cda8;
+}
+.login-transition {
+  background: var(--bg);
+  animation:
+    login-enter 500ms ease-in-out both,
+    login-exit 1600ms ease-in-out 2100ms forwards;
+}
+.login-transition .transition-center {
+  animation:
+    login-logo-in 700ms cubic-bezier(0.2, 0.7, 0.3, 1) both,
+    login-logo-out 1600ms ease-in-out 2100ms forwards;
+}
+.login-transition .transition-emblem {
+  width: 228px;
+  height: 228px;
+}
+.login-transition .transition-halo {
+  position: absolute;
+  width: 204px;
+  height: 204px;
+  border-radius: 50%;
+  background: #e7f3ed;
+  opacity: 0.8;
+}
+.login-transition .transition-orbit {
+  width: 228px;
+  height: 228px;
+  border-color: #c5e3d5;
+  animation: spin 2800ms linear infinite;
+}
+.login-transition .transition-orbit > i {
+  background: var(--accent);
+  box-shadow: none;
+  width: 7px;
+  height: 7px;
+  top: -4px;
+}
+.login-transition .transition-logo {
+  width: 118px;
+  height: 118px;
+  filter: none;
+  border-radius: 28px;
+  animation: login-logo-scale 700ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+.login-transition .logo-sheen {
+  display: none;
+}
+.login-transition .transition-signature {
+  top: 256px;
+}
+.login-transition .transition-wordmark {
+  font-size: 32px;
+  line-height: 40px;
+  color: var(--text);
+}
+.login-transition .transition-wordmark > span {
+  animation: none;
+}
+.login-transition .transition-wordmark > span:last-child {
+  color: inherit;
+}
+.login-transition .transition-rule {
+  animation: none;
+  width: 28px;
+  height: 3px;
+  margin-top: 18px;
+  background: var(--accent);
+}
+.login-transition .transition-signature p {
+  animation: none;
+  color: var(--muted);
+  margin-top: 16px;
+  letter-spacing: 0;
+}
+[data-theme="dark"] .login-transition .transition-halo {
+  background: #123b30;
+}
+[data-theme="dark"] .login-transition .transition-orbit {
+  border-color: #28634e;
+}
+.app-login-reveal {
+  animation: app-login-reveal 1600ms ease-in-out 2100ms both;
+}
+.main-content > div > div {
+  animation: page-in 300ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+.modal[open] {
+  animation: modal-in 280ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+.modal {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(480px, calc(100vw - 28px));
+  max-width: calc(100vw - 28px);
+  max-height: calc(100dvh - 32px);
+  overscroll-behavior: contain;
+}
+.table-scroll {
+  position: relative;
+}
+.modal[open]::backdrop {
+  animation: login-enter 200ms ease-in-out both;
+}
+.chat-message {
+  animation: page-in 220ms ease-out both;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 650ms;
+  animation-timing-function: cubic-bezier(0.42, 0, 0.58, 1);
+}
+@keyframes boot-exit {
+  0%,
+  18.46% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes boot-logo {
+  0% {
+    transform: perspective(900px) translateY(60px) scale(1) rotateY(0)
+      rotateZ(0);
+  }
+  14% {
+    transform: perspective(900px) translateY(66px) scale(0.94) rotateY(-12deg)
+      rotateZ(-3deg);
+  }
+  40% {
+    transform: perspective(900px) translateY(12px) scale(1.065) rotateY(3deg)
+      rotateZ(0.5deg);
+  }
+  68% {
+    transform: perspective(900px) translateY(-4px) scale(0.99) rotateY(2deg)
+      rotateZ(0.2deg);
+  }
+  100% {
+    transform: perspective(900px) translateY(0) scale(1) rotateY(0) rotateZ(0);
+  }
+}
+@keyframes glow-atmosphere {
+  0% {
+    opacity: 0;
+  }
+  6.58% {
+    opacity: 0.03;
+  }
+  31.58% {
+    opacity: 0.3;
+  }
+  78.95%,
+  100% {
+    opacity: 0.24;
+  }
+}
+@keyframes glow-breath {
+  0%,
+  100% {
+    transform: translate(-50%, -55%) scale(0.95);
+  }
+  50% {
+    transform: translate(-50%, -55%) scale(1.12);
+  }
+}
+@keyframes logo-breath {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-5deg);
+  }
+  50% {
+    transform: translateY(-7px) rotate(-3deg);
+  }
+}
+@keyframes landscape-breath {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -12px;
+  }
+}
+@keyframes boot-orbit {
+  0%,
+  8% {
+    opacity: 0;
+    transform: translateY(60px) scale(0.7) rotate(-80deg);
+  }
+  29% {
+    opacity: 0.8;
+  }
+  47% {
+    transform: scale(1) rotate(10deg);
+  }
+  68% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0.22;
+    transform: scale(1.05) rotate(110deg);
+  }
+}
+@keyframes boot-orbit-second {
+  0%,
+  8% {
+    opacity: 0;
+    transform: translateY(60px) scale(0.7) rotate(140deg);
+  }
+  29% {
+    opacity: 0.8;
+  }
+  47% {
+    transform: scale(1) rotate(57deg);
+  }
+  68% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0.22;
+    transform: scale(1.05) rotate(-35deg);
+  }
+}
+@keyframes boot-particle {
+  0% {
+    opacity: 0;
+    transform: translate(calc(var(--px) * 0.45), calc(var(--py) * 0.45 + 60px));
+  }
+  16% {
+    opacity: 0.85;
+  }
+  60% {
+    opacity: 0.45;
+    transform: translate(var(--px), var(--py));
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--px) * 1.12), calc(var(--py) * 1.12 - 12px));
+  }
+}
+@keyframes boot-sheen {
+  0% {
+    opacity: 0;
+    transform: translateX(-220px) rotate(-24deg);
+  }
+  27%,
+  73% {
+    opacity: 0.65;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(330px) rotate(-24deg);
+  }
+}
+@keyframes wordmark-letter {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes signature-rule {
+  from {
+    opacity: 0;
+    transform: scaleX(0.1);
+  }
+  to {
+    opacity: 0.8;
+    transform: scaleX(1);
+  }
+}
+@keyframes tagline-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes login-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes login-exit {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes login-logo-in {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes login-logo-out {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  65%,
+  100% {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+}
+@keyframes login-logo-scale {
+  from {
+    transform: scale(0.82);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+@keyframes app-login-reveal {
+  from {
+    opacity: 0.55;
+    transform: scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes logo-entrance {
+  from {
+    opacity: 0;
+    transform: scale(0.82) translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@media (max-width: 600px) {
+  .mobile-brand {
+    display: flex;
+    font-size: 28px;
+    margin-bottom: 34px;
+  }
+  .mobile-brand .official-logo {
+    width: 37px;
+    height: 37px;
+  }
+  .auth-form-logo {
+    display: none;
+  }
+  .transition-emblem {
+    width: 180px;
+    height: 180px;
+  }
+  .boot-transition .transition-logo {
+    width: 180px;
+    height: 180px;
+  }
+  .boot-transition .transition-signature {
+    top: 215px;
+  }
+  .transition-wordmark {
+    font-size: 37px;
+  }
+  .boot-transition .transition-center {
+    transform: translateY(-50px);
+  }
+  .transition-orbit {
+    width: 256px;
+    height: 256px;
+  }
+  .transition-orbit.second {
+    width: 312px;
+    height: 312px;
+  }
+  .auth-main {
+    padding-top: 28px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .brand-transition {
+    animation: boot-exit 180ms linear both !important;
+  }
+  .login-transition {
+    animation: login-exit 180ms linear both !important;
+  }
+  .brand-transition * {
+    animation: none !important;
+    transform: none !important;
+  }
+  .transition-signature {
+    transform: translateX(-50%) !important;
+  }
+  .transition-wordmark > span,
+  .transition-signature p,
+  .transition-rule {
+    opacity: 1 !important;
+  }
+  .boot-glow {
+    transform: translate(-50%, -55%) !important;
+  }
+  .boot-particle,
+  .transition-orbit,
+  .logo-sheen {
+    display: none;
+  }
+  .app-login-reveal {
+    animation: none !important;
+  }
+  .illustration-symbol {
+    animation: none !important;
+  }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+}
